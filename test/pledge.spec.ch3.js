@@ -1,5 +1,5 @@
 'use strict';
-describe('Chapter 3: Rejection Callback Attachment', function(){
+describe('Capítulo 3: Rejection Callback Attachment', function(){
 /*=======================================================
 
 
@@ -13,18 +13,18 @@ describe('Chapter 3: Rejection Callback Attachment', function(){
                          "Y8888P"
 
 
-Chapter 3: Completing the Handlers: Rejection & Catch
+Capítulo 3: Completando los Handlers: Rejection & Catch
 ---------------------------------------------------------*/
-// With `.resolve` sending and `.then` acting on data, we have
-// a major part of promises working. Rejection is similar;
-// finish the "callback aggregation" of promises in this chapter.
+// Con `.resolve` enviando y `.then` actuando en data, tenemos
+// una mayor parte de las promeses funcionando. Rejection es similar;
+// termina la agregación de callback de promesas en este capítulo.
 /*========================================================*/
 
 /* global $Promise */
 
 function noop () {}
 
-describe('Another promise', function(){
+describe('Otra promise', function(){
 
   var promiseForThing, log;
   var logOops = jasmine.createSpy('logOops').and.callFake(function () {
@@ -40,16 +40,16 @@ describe('Another promise', function(){
     logInput.calls.reset();
   });
 
-  describe('that is not yet rejected', function(){
+  describe('que todavía no es rechazada', function(){
 
-    xit('does not call error handlers yet', function(){
+    xit('no llama a los errors handlers aún', function(){
       promiseForThing.then( null, logOops );
       expect( logOops ).not.toHaveBeenCalled();
     });
 
   });
 
-  describe('that is already rejected', function(){
+  describe('que ya esta rechazada', function(){
 
     var theReason = { code: 'timed out' };
     beforeEach(function(){
@@ -62,22 +62,22 @@ describe('Another promise', function(){
     // those `handlerGroups`? There is going to have to be some
     // sort of "safety check" somewhere…
 
-    xit('does not call any success handlers', function(){
+    xit('no llama a ningún success handler', function(){
       promiseForThing.then( logOops );
       expect( logOops ).not.toHaveBeenCalled();
     });
 
-    xit('calls an error handler added by `.then`', function(){
+    xit('llama un error handler agregado por `.then`', function(){
       promiseForThing.then( null, logOops );
       expect( logOops ).toHaveBeenCalled();
     });
 
-    xit("calls an error handler by passing in the promise's value", function(){
+    xit("llama un error handler pasando el valor de la promesa", function(){
       promiseForThing.then( null, logInput );
       expect( logInput ).toHaveBeenCalledWith( theReason );
     });
 
-    xit('calls each error handler once per attachment', function(){
+    xit('llama una vez cada error handler adjuntado', function(){
       promiseForThing.then( null, logOops );
       promiseForThing.then( null, logInput );
       promiseForThing.then( null, logInput );
@@ -86,7 +86,7 @@ describe('Another promise', function(){
       expect( logInput ).toHaveBeenCalledWith( theReason );
     });
 
-    xit('calls each error handler in the order added', function(){
+    xit('llama cada error handler en el orden agregado', function(){
       promiseForThing.then( null, logOops );
       promiseForThing.then( null, logInput );
       expect( log ).toEqual( [{ code: 'oops'}, {code: 'timed out'}] );
@@ -94,17 +94,17 @@ describe('Another promise', function(){
 
   });
 
-  describe('that already has an error handler', function(){
+  describe('que ya tiene un error handler', function(){
 
     var theReason = { code: 'unauthorized' };
 
-    xit('calls that handler when rejected', function(){
+    xit('llama a ese handler cuando es rechazado', function(){
       promiseForThing.then( null, logInput );
       promiseForThing._internalReject( theReason );
       expect( logInput ).toHaveBeenCalledWith( theReason );
     });
 
-    xit('calls all its error handlers in order one time when rejected', function(){
+    xit('llama a todos sus errors handlers en orden una vez cuando es rechazado', function(){
       promiseForThing.then( null, logInput );
       promiseForThing.then( null, logOops );
       promiseForThing._internalReject( theReason );
@@ -113,10 +113,10 @@ describe('Another promise', function(){
 
   });
 
-  // This next part is a demonstration; with working resolution and rejection,
-  // promises can be used as drop-in callback replacements.
+  // Esta parte es una demostración; con resolution y rejection
+  // funcionando, promeses pueden ser usadas como un reemplazo al callback
 
-  describe('with both success and error handlers', function(){
+  describe('con ambos success y error handlers', function(){
 
     var ui;
     beforeEach(function(){
@@ -136,19 +136,19 @@ describe('Another promise', function(){
 
     });
 
-    xit('can do stuff with fulfilled data', function(){
+    xit('puede hacer cosas con data completada', function(){
       promiseForThing._internalResolve({ animal: 'duckling' });
       expect( ui.animals[2] ).toBe( 'duckling' );
     });
 
-    xit('can deal with rejection reasons', function(){
+    xit('puede lidear con razones del reject', function(){
       promiseForThing._internalReject({ message: 'unauthorized' });
       expect( ui.warning ).toBe( 'unauthorized' );
     });
 
-    // Optional but recommended garbage collection
+    // Opcional pero recomendable garbage collection
 
-    xit('discards handlers that are no longer needed', function(){
+    xit('descarta handlers que no son más necesarios', function(){
       promiseForThing._internalResolve({ animal: 'chipmunk' });
       expect( promiseForThing._handlerGroups ).toEqual( [] );
     });
@@ -157,11 +157,11 @@ describe('Another promise', function(){
 
 });
 
-// A quick detour while we are finishing rejections: add a `.catch` convenience
-// method to your promise prototype. The internals of this method can be coded
-// as one short line.
+// Un rápido desvío mientras estamos terminando rejections: agregá
+// un método `.catch` a tu promise prototype. Las internas de este
+// metodo pueden ser codeadas en una corta linea
 
-describe("A promise's `.catch` method", function(){
+describe("Un metodo `.catch`", function(){
 
   var promise;
   beforeEach(function(){
@@ -170,26 +170,26 @@ describe("A promise's `.catch` method", function(){
   });
   function myFunc (reason) { console.log(reason); }
 
-  xit('attaches the passed-in function as an error handler', function(){
+  xit('adjunta la función pasada como un error handler', function(){
     promise.catch( myFunc );
     expect( promise.then ).toHaveBeenCalledWith( null, myFunc );
   });
 
-  // This spec will probably already pass at this point, because by default all
-  // functions return `undefined`. However, as you start Ch. 4, this may fail.
-  // If that happens, you will have to return here and fix `.catch` — this
-  // time, taking the Ch. 4 specs into account.
+  // Este spec probablemente ya este pasando en este punto, porque
+  // por defecto todas las funciones devuelven `undefined`. Sin embargo,
+  // cuando empecemos Cap. 4, esto puede fallar. Si eso pasa, vas a tener
+  // que retornar aquí y arreglar `.catch` - esta vez, tomando los specs
+  // del Cap 4 en cuenta.
 
-  xit('returns the same kind of thing that .then would', function(){
+  xit('devuelve lo mismo que .then devolvería', function(){
     var catchReturn = promise.catch( myFunc );
     var thenReturn = promise.then( null, myFunc );
     [catchReturn, thenReturn].forEach(sanitize);
-    // should be visually identical (but are not necessarily ===):
+    // debería ser visualmente identico (pero no son necesariamente ===):
     expect( catchReturn ).toEqual( thenReturn );
   });
 
-  // Utility to simplify the return value somewhat. Not always necessary, but
-  // some valid solutions don't work with normal `toEqual`.
+  // La utilidad para simplificar el valor retornado. No siempre necesario, pero algunas soluciones validas no siempre funcionan con normal `toEqual`.
 
   function sanitize (val) {
     if (!val || typeof val !== 'object') return;
@@ -203,12 +203,13 @@ describe("A promise's `.catch` method", function(){
 
 });
 
-// That finishes the attachment and triggering of our handlers! In the next
-// chapter, we will dive deeply into how `.then` chaining actually works.
-// This behavior is what drives promises beyond being just portable callback
-// sinks and transforms them into dynamic, versatile, powerful,
-// manipulatable machines.
+// Eso termina la adhesión y el disparador de nuestros handlers!
+// En el siguiente capítulo, vamos a bucear en las profundidades
+// de como `.then` chaining funciona realmente. Este comportamiento
+// es lo que lleva a las promesas mas alla de ser solamente callbacks
+// portables, los transforma en dinamicos, vesatiles poderosos, y
+// manipulables máquinas.
 
 });
 
-// Don't forget to `git commit`!
+// No te olvides de `git commit`!

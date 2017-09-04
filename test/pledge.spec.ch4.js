@@ -1,5 +1,5 @@
 'use strict';
-describe('Chapter 4: Promise Chaining and Transformation', function(){
+describe('Chapter 4: Promise Chaining y Transformación', function(){
 /*=======================================================
 
 
@@ -13,16 +13,17 @@ describe('Chapter 4: Promise Chaining and Transformation', function(){
                               888
 
 
-Chapter 4: Promises Can Return Values and Chain Together
+Capítulo 4: Las Promises pueden retornar valores y conectarse entre ellas
 ---------------------------------------------------------*/
-// A crucial aspect of promises is that `.then` always
-// returns a new promise. When values are returned from
-// promise A's handler, they are exported and represented by
-// the return promise B. This leads to remarkably versatile
-// behavior: choosing when to catch errors, chaining promises
-// together, easily passing around promised values and acting
-// on them where convenient… even returning new values.
-// This chapter may be challenging.
+// Un aspecto crucial de las promises es que `.then` siempre
+// retorna una nueva promesa. Cuando los valores son retornados
+// por el handler de promise A, son exportados y representados
+// por la promesa B retornada. Esto lleva a un comportamiento
+// remarcadamente versatil: Elegir cuando atrapar los errores,
+// conectando promesas juntas, fácilmente pasar alrededor valores
+// de las promesas y actuar sobre ellos cuando sea conveniente...
+// incluso retornar nuevos valores.
+// Este capitulo puede ser dificultoso.
 /*========================================================*/
 
 /* global $Promise customMatchers */
@@ -30,7 +31,7 @@ Chapter 4: Promises Can Return Values and Chain Together
 
 function noop () {}
 
-describe('For a given promiseA (pA)', function(){
+describe('por una dada promiseA (pA)', function(){
 
   var promiseA, thisReturnsHi, thisThrowsShade;
   beforeEach(function(){
@@ -39,107 +40,113 @@ describe('For a given promiseA (pA)', function(){
     thisThrowsShade = function () { throw 'shade'; };
   });
 
-  // Our parent promise must maintain some kind of reference to the downstream
-  // promise, in order to control chaining.
+  // Nuestras promise padres deben mantener algún tipo de
+  // referencia a la promesa de abajo (downstreamPromise)
+  // en orden de controlar el chaining
 
-  xit('`.then` adds a new promise to its handler group', function(){
+  xit('`.then` agregá una nueva promesa a su handlerGroups', function(){
     promiseA.then();
     var groups = promiseA._handlerGroups;
     expect( groups[0].downstreamPromise instanceof $Promise ).toBe( true );
-    // each handler group has its own `downstreamPromise`
+    // cada handler group tiene su propio `downstreamPromise`
     promiseA.then();
     expect( groups[1].downstreamPromise instanceof $Promise ).toBe( true );
     expect( groups[1].downstreamPromise ).not.toBe( groups[0].downstreamPromise );
   });
 
-  // Passing this may break your `.catch` from chapter 3. If that happens,
-  // you will have to go back and fix `.catch`, taking this spec into account.
+  // Pasar esto puede romper tu `.catch` del capítulo 3. Si eso pasase,
+  // vas a tener que ir para atras y arreglar `.catch`, tomando este
+  // spec en cuenta.
 
-  xit('`.then` returns that downstream promise', function(){
+  xit('`.then` devuelve ese downstreamPromise', function(){
     var promiseB = promiseA.then();
     expect( promiseB ).toBe( promiseA._handlerGroups[0].downstreamPromise );
   });
 
-  // This section is detailed in the Promises Flowchart. Refer to the PDF.
+  // Esta sección esta detallada en la Promises Flowchart. Referíte al PDF.
 
-  describe('that returns promiseB (pB) via `.then`:', function(){
+  describe('que devuelve promiseB (pB) via `.then`:', function(){
 
     var FAST_TIMEOUT = 10;
 
-    /* (In `utils/custom.matchers.js`, lets us test your promise cleanly.) */
+    /* (En `utils/custom.matchers.js`, nos permite testear tu promise limpiamente.) */
     beforeEach(function(){
       jasmine.addMatchers(customMatchers);
     });
 
-    // Fulfillment bubbles down to the first available success handler.
+    // Fulfillment baja al primer success handler disponible.
 
-    xit("if pA is fulfilled but has no success handler, pB is fulfilled with pA's value", function (done) {
+    xit("si pA es completado pero no tiene un success handler, pb es completado con el valor de pA", function (done) {
       var promiseB = promiseA.then();
       promiseA._internalResolve( 9001 );
-      // Do not set state manually; a resolver should be called somewhere.
+      // No setea un estado manualmente; un resolver debería ser llamado.
       expect( promiseB._state ).toBe( 'fulfilled' );
       expect( promiseB._value ).toBe( 9001 );
-      // The above is a hint; from now on we'll use this custom matcher. Ignore
-      // the `done`, needed because Jasmine doesn't support async matchers.
+      // Lo de arriba es una pista; de ahora en adelante vamos a usar
+      // este matcher personalizado.
+      // Ignorá el `done`, necesario porque Jasmine no soporta async matchers.
       expect( promiseB ).toFulfillWith( 9001, done );
     }, FAST_TIMEOUT);
 
-    // Rejection bubbles down to the first available error handler.
+    // Rejection baja al primer error handler disponible.
 
-    xit("if pA is rejected but has no error handler, pB is rejected with pA's reason", function (done) {
+    xit("Si pA es rechazado pero no tiene un error handler, pB es rechazado con la razón de pA", function (done) {
       var promiseB = promiseA.then();
       promiseA._internalReject( 'darn' );
-      // Do not set state manually; a rejector should be called somewhere.
+      // No setea el estado manualmente; un rejector debería ser llamado
       expect( promiseB._state ).toBe( 'rejected' );
       expect( promiseB._value ).toBe( 'darn' );
-      // The above is a hint; from now on we'll use this custom matcher.
+      // Lo de arriba es una pista; de ahora en adelante vamos a usar
+      // este matcher personalizado.
       expect( promiseB ).toRejectWith( 'darn', done );
     }, FAST_TIMEOUT);
 
-    // This is for normal (synchronous / non-promise) return values
+    // Esto es para valores normales (sincrónico / non-promise) retornados
 
-    xit("if pA's success handler returns a value `x`, pB is fulfilled with `x`", function (done) {
+    xit("si el success handler de pA retorna un valor `x`m pB es completado con `x`", function (done) {
       var promiseB = promiseA.then( thisReturnsHi );
       promiseA._internalResolve();
       expect( promiseB ).toFulfillWith( 'hi', done );
     }, FAST_TIMEOUT);
 
-    // This is for normal (synchronous / non-promise) return values
+    // Esto es para valores normales (sincrónico / non-promise) retornados
 
-    xit("if pA's error handler returns a value `x`, pB is fulfilled with `x`", function (done) {
-      // Why fulfilled? This is similar to `try`-`catch`. If promiseA is
-      // rejected (equivalent to `try` failure), we pass the reason to
-      // promiseA's error handler (equivalent to `catch`). We have now
-      // successfully handled the error, so promiseB should represent
-      // the error handler returning something useful, not a new error.
-      // promiseB would only reject if the error handler itself failed
-      // somehow (which we already addressed in a previous test).
+    xit("si el error handler de pA retorna un valor `x`, pB es completado con `x`", function (done) {
+      // ¿Por qué completado? Esto es similar a `try`-`catch`. Si la
+      // promiseA es rechazada (equivalente a un `try` fallido), pasamos
+      // la razón al error handler de promiseA (equivalente a `catch`).
+      // Ahora hemos manejado el error correctamente, entonces promiseB
+      // debería representar el error handler retornando algo útil, no un
+      // nuevo error. promiseB solo rechazaría si el error handler por si
+      // mismo falla de alguna forma (el cual ya fue abordado en un test previo).
+
       var promiseB = promiseA.catch( thisReturnsHi );
       promiseA._internalReject();
       expect( promiseB ).toFulfillWith( 'hi', done );
     }, FAST_TIMEOUT);
 
-    // Exceptions cause the returned promise to be rejected with the error.
-    // Hint: you will need to use `try` & `catch` to make this work.
+    // Excepciones causan que la promesa retornado sea rechazada con un error
+    // Pista: vas a necesitar usar `try` & `catch` para hacer que esto funcione
 
-    xit("if pA's success handler throws a reason `e`, pB is rejected with `e`", function (done) {
+    xit("si el success handler de pA arroja una razon `e`, pB es rechazada con `e`", function (done) {
       var promiseB = promiseA.then( thisThrowsShade );
       promiseA._internalResolve();
       expect( promiseB ).toRejectWith( 'shade', done );
     }, FAST_TIMEOUT);
 
-    xit("if pA's error handler throws a reason `e`, pB is rejected with `e`", function (done) {
+    xit("si el error handler de pA arroja una razon `e`, pB es rechazada con `e`", function (done) {
       var promiseB = promiseA.catch( thisThrowsShade );
       promiseA._internalReject();
       expect( promiseB ).toRejectWith( 'shade', done );
     }, FAST_TIMEOUT);
 
-    //  What if promiseA returns a promiseZ? You could handle pZ like a
-    // normal value, but then you have to start writing `.then` inside `.then`.
-    // Instead, we want to make promiseB to "become" pZ by copying
-    // pZ's behavior — aka assimilation. These four tests are brain-benders.
+    // ¿Qué pasa si promiseA retorna una promesaZ? Podrías manejar pZ
+    // como un valor normal, pero luego vas a tener que empezar escribiendo
+    // `.then` dentro de `.then`. En cambio, queremos hacer promiseB ser pZ
+    // copiando el comportamiento de pZ - a.k.a asimilación. EStos cuatro
+    // tests pueden causar dolores de cabeza
 
-    xit("if pA's success handler returns promiseZ which fulfills, pB mimics pZ", function (done) {
+    xit("si el success handler de pA retorna pZ que se completa, pB imita a pZ", function (done) {
       var promiseZ = new $Promise(noop);
       var promiseB = promiseA.then(function(){
         return promiseZ;
@@ -149,7 +156,7 @@ describe('For a given promiseA (pA)', function(){
       expect( promiseB ).toFulfillWith( 'testing', done );
     }, FAST_TIMEOUT);
 
-    xit("if pA's error handler returns promiseZ which fulfills, pB mimics pZ", function (done) {
+    xit("si el error handler de pA retorna pZ la cual se completa, pB imita a pZ", function (done) {
       var promiseZ = new $Promise(noop);
       var promiseB = promiseA.catch(function(){
         return promiseZ;
@@ -159,7 +166,7 @@ describe('For a given promiseA (pA)', function(){
       expect( promiseB ).toFulfillWith( 'testing', done );
     }, FAST_TIMEOUT);
 
-    xit("if pA's success handler returns promiseZ which rejects, pB mimics pZ", function (done) {
+    xit("si el success handler de pA retorna pZ que se rechaza, pB imita a pZ", function (done) {
       var promiseZ = new $Promise(noop);
       var promiseB = promiseA.then(function(){
         return promiseZ;
@@ -169,7 +176,7 @@ describe('For a given promiseA (pA)', function(){
       expect( promiseB ).toRejectWith( 'testing', done );
     }, FAST_TIMEOUT);
 
-    xit("if pA's error handler returns promiseZ which rejects, pB mimics pZ", function (done) {
+    xit("si el error handler de pA retorna pZ que se rechaza, pB imita a pZ", function (done) {
       var promiseZ = new $Promise(noop);
       var promiseB = promiseA.catch(function(){
         return promiseZ;
@@ -179,14 +186,14 @@ describe('For a given promiseA (pA)', function(){
       expect( promiseB ).toRejectWith( 'testing', done );
     }, FAST_TIMEOUT);
 
-    // To really test assimilation properly would require many more specs.
-    // But we won't be that strict.
+    // Para realmente testear de forma apropiada asimilación
+    // requeriría muchos mas specs. Pero no vamos a ser tan estrictos.
 
-    // All the above specs settled their promise AFTER returning the new
-    // promise. But of course you can still chain off of settled promises!
-    // Your solution might already pass this. But maybe not…
-
-    xit('still chains correctly if the promise is already settled', function (done) {
+    // Todo los specs de arriba colocan su promesa LUEGO de retornar
+    // la nueva promesa. Pero por supuesto podés conectar en promesas
+    // ya colocadas! Tu solución puede ya estar pasando esto.
+    // Pero quizás no...
+    xit('igual conecta correctamente si la promesa ya esta colocada', function (done) {
       // utility / helper functions
       var count = 0, shouldFulfill, shouldReject;
       function countPassed () { if (++count === 10) done(); }
@@ -228,9 +235,9 @@ describe('For a given promiseA (pA)', function(){
 
   });
 
-  // Another demonstration. This should work if the previous specs passed.
+  // Otra demostración. Esto debería funcionar si los previos specs pasaron.
 
-  xit('`.then` can be chained many times', function(){
+  xit('`.then` puede ser encadenado muchas veces', function(){
     var add1 = function (num) { return ++num; };
     var test = 0;
     promiseA
@@ -247,12 +254,14 @@ describe('For a given promiseA (pA)', function(){
 });
 
 
-// Wow! If you got this far, congratulations. We omitted certain details
-// (e.g. handlers must always be called in a true async wrapper), but you have
-// built a promise library with most of the standard behavior. In the next
-// (optional, but recommended) chapter, we'll be adding in some common library
-// methods that make working with promises easier and cleaner.
+// Wow! Si llegaste tan lejos, felicitaciones. Hemos omitido ciertos
+// detalles (por ejemplo: los handlers debén siempre ser llamados en
+// un verdadero async wrapper), pero haz construido una libreria de
+// promesas con la mayoría del comportamiento standard. En el siguiente
+// capítulo (opcional, pero recomendado), va a añadir algunos métodos
+// comunes de la libreria que hacen trabajar con promesas más fácil
+// y prolijo.
 
 });
 
-// Don't forget to `git commit`!
+// No te olvides de `git commit`!

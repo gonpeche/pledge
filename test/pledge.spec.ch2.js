@@ -1,5 +1,5 @@
 'use strict';
-describe('Chapter 2: Fulfillment Callback Attachment', function(){
+describe('Capítulo 2: Fulfillment Callback Attachment', function(){
 /*======================================================
 
 
@@ -13,24 +13,23 @@ describe('Chapter 2: Fulfillment Callback Attachment', function(){
                         888888888
 
 
-Chapter 2: Attaching and Calling Promise Event Handlers
+Capítulo 2: Adjuntando y llamando Promise Event Handlers
 --------------------------------------------------------*/
-// We are beginning to see how a promise can be manipulated
-// through the executor. But what does a promise actually do?
-// By completing this chapter, you will learn the fundamentals
-// of how promises act on eventual information.
+// Estamos comenzando a ver como una promesa puede ser manipulada
+// a través  del executor. ¿Pero qué hace realmente una promesa?
+// Al completar este capitulo, vas a aprender los fundamentos de
+// como las promesas actuan con información eventual
 /*========================================================*/
 
 /* global $Promise */
 
 function noop () {}
 
-// `then` is the core of promise behavior. In fact, the P/A+ spec which forms
-// the underpinnings of the ES6 spec only covers this method. The `then`
-// function is used to register *handlers* if and when the promise either
-// fulfills or rejects.
-
-describe("A promise's `.then` method", function(){
+// `then` es el core del comportamiento de las promesas. De hecho,
+// el P/A+ spec que foma los fundamentos del spec de ES6 solo cubre
+// este método. La función `then` es usada para registrar *handlers*
+// si y cuando la promesa se completa o rechaza.
+describe("El método .then de una promesa", function(){
 
   var promise, s1, e1, s2, e2;
   beforeEach(function(){
@@ -41,16 +40,17 @@ describe("A promise's `.then` method", function(){
     e2 = function (/* reason */) { /* handle reason */ };
   });
 
-  xit('adds groups of handlers (callback functions) to the promise', function(){
+  xit('agrega grupos de handlers (funciones callbacks) a la promesa', function(){
     promise.then( s1, e1 );
     expect( promise._handlerGroups[0].successCb ).toBe( s1 );
     expect( promise._handlerGroups[0].errorCb   ).toBe( e1 );
   });
 
-  // This is calling `then` on the same promise multiple times, which is NOT
-  // the same as "chaining." We'll deal with promise chaining in Ch. 4.
+  // Esto es llamar `then` en la misma promesa multiples veces,
+  // el cual no es lo mismo que "chaining". Vamos a ver promise
+  // chaining en el Cap. 4.
 
-  xit('can be called multiple times to add more handlers', function(){
+  xit('puede ser llamado multiples veces para añadir mas handlers', function(){
     promise.then( s1, e1 );
     expect( promise._handlerGroups[0].successCb ).toBe( s1 );
     expect( promise._handlerGroups[0].errorCb   ).toBe( e1 );
@@ -59,7 +59,7 @@ describe("A promise's `.then` method", function(){
     expect( promise._handlerGroups[1].errorCb   ).toBe( e2 );
   });
 
-  xit('attaches a falsy value in place of non-function success or error callbacks', function(){
+  xit('agrega un valor falso en lugar de callbacks que no son funciones en el success o error', function(){
     promise.then( 'a string', {} );
     expect( promise._handlerGroups[0].successCb ).toBeFalsy();
     expect( promise._handlerGroups[0].errorCb   ).toBeFalsy();
@@ -67,10 +67,11 @@ describe("A promise's `.then` method", function(){
 
 });
 
-// Now comes one of the "magic" parts of promises — the way they can trigger
-// handlers both when they settle, and also after they have already settled.
+// Ahora viene una de las partes mágicas de las promesas, la
+// forma en que pueden disparar handlers para ambos, cuando se
+// colocan y cuando ya han sido colocados.
 
-describe('A promise', function(){
+describe('Una promise', function(){
 
   var promiseForNum, foo;
   var setFoo10 = jasmine.createSpy('setFoo10').and.callFake(function () {
@@ -86,34 +87,34 @@ describe('A promise', function(){
     addToFoo.calls.reset();
   });
 
-  describe('that is not yet fulfilled', function(){
+  describe('que no se ha completado todavía', function(){
 
-    xit('does not call any success handlers yet', function(){
+    xit('no llama ningún success handler aún', function(){
       promiseForNum.then( setFoo10 );
       expect( setFoo10 ).not.toHaveBeenCalled();
     });
 
   });
 
-  describe('that is already fulfilled', function(){
+  describe('que ya esta completada', function(){
 
     beforeEach(function(){
       promiseForNum._internalResolve( 25 );
     });
 
-    // Recommended: add a `._callHandlers` method to your promise prototype.
+    // Recomendado: agergá un método `._callHandlers` al prototipo de tu promesa
 
-    xit('calls a success handler added by `.then`', function(){
+    xit('llama al success handles agregado por `.then`', function(){
       promiseForNum.then( setFoo10 );
       expect( setFoo10 ).toHaveBeenCalled();
     });
 
-    xit("calls a success handler by passing in the promise's value", function(){
+    xit("llama un success handler pasando el valor de la promesa", function(){
       promiseForNum.then( addToFoo );
       expect( addToFoo ).toHaveBeenCalledWith( 25 );
     });
 
-    xit('calls each success handler once per attachment', function(){
+    xit('llama a cada success handler, una vez por cada adhesión', function(){
       promiseForNum.then( setFoo10 );
       promiseForNum.then( addToFoo );
       promiseForNum.then( addToFoo );
@@ -122,7 +123,7 @@ describe('A promise', function(){
       expect( addToFoo ).toHaveBeenCalledWith( 25 );
     });
 
-    xit('calls each success handler when added', function(){
+    xit('llama cada success handler cuando es añadido', function(){
       promiseForNum.then( setFoo10 );
       expect( foo ).toBe( 10 );
       promiseForNum.then( addToFoo );
@@ -131,18 +132,18 @@ describe('A promise', function(){
 
   });
 
-  // So we can run callbacks if we already have the value.
-  // But what if events occur in opposite order?
+  // Entonces podemos correr callbacks si ya tenemos el valor.
+  // ¿Pero qué pasa si el evento ocurre en orden opuesto?
 
-  describe('that already has a success handler', function(){
+  describe('que ya tiene un success handler', function(){
 
-    xit('calls that handler when fulfilled', function(){
+    xit('llama ese handler cuando es completado', function(){
       promiseForNum.then( setFoo10 );
       promiseForNum._internalResolve();
       expect( setFoo10 ).toHaveBeenCalled();
     });
 
-    xit('calls all its success handlers in order one time when fulfilled', function(){
+    xit('llama todos los success handlers en orden una vez cuando son completados', function(){
       promiseForNum.then( setFoo10 );
       promiseForNum.then( addToFoo );
       promiseForNum._internalResolve( 25 );
@@ -154,12 +155,13 @@ describe('A promise', function(){
 });
 
 
-// We've just made something nifty. A promise's `.then` can attach behavior
-// both before & after the promise is actually fulfilled, and we know that the
-// actions will run when they can. The `.then` method can also be called
-// multiple times, so you can attach callbacks to run in different parts of
-// your code, and they will all run once the promise is fulfilled.
+// Hemos hecho algo elegante. El `.then` de la promesa puede adjuntar
+// comportamiento antes y después de que la promesa este completada,
+// y sabemos que las acciones van a correr cuando puedan. El método
+// `.then` puede también ser llamado multiples veces, así podes adjuntar
+// callbacks para correr en diferentes pares del código, y van a poder
+// correr una vez la promesa se complete.
 
 });
 
-// Don't forget to `git commit`!
+// ¡No te olvides de `git commit`!

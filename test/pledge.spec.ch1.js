@@ -13,7 +13,7 @@
 
 
 
-describe('Chapter 1: Structure and State', function(){
+describe('Capitulo 1: Estructura y Estado', function(){
 /*======================================================
 
 
