@@ -1,5 +1,5 @@
 'use strict';
-describe('Chapter 5: Static Methods `.resolve` and `.all`', function(){
+describe('Capítulo 5: Métodos estáticos `.resolve` y `.all`', function(){
 /*=======================================================
 
 
@@ -13,22 +13,21 @@ describe('Chapter 5: Static Methods `.resolve` and `.all`', function(){
                          "Y8888P
 
 
-Chapter 5: Extra Credit: Static Methods `.resolve` and `.all`
+Capítulo 5: Credito Extra: Métodos estáticos `.resolve` y `.all`
 ---------------------------------------------------------*/
-// Promises on their own have many advantages over callbacks,
-// chiefly when dealing with *composability* — combining and
-// orchestrating multiple asynchronous results. That being
-// said, practically every promise library provides a couple
-// of helper functions to make promise composition even easier.
-// In this chapter you will implement two of the most crucial
-// static methods, so useful they are part of the ES6 spec for
-// promises (EcmaScript follows, but also goes beyond, P/A+).
+// Promises por si mismo tiene muchas ventajas sobre callbacks,
+// principalmente cuando se trata con *composibilidad* - combinando
+// y orquestrando múltiples resultados asincrónicos. Habiendo dicho
+// eso, prácticamente cada libreria de promesas provee un par de
+// helper functions para hacer la composición de promesas aún más
+// fácil. En este capítulo vas a implementar dos de los mas cruciales
+// metodos estáticos, tan utiles que son partes del ES6 spec para
+// promesas (EcmaScript sigue, pero también va mas alla de, P/A+).
 
-// SPECIAL NOTE: the best solutions for this chapter DO NOT
-// CALL `_internalResolve` or `_internalReject` directly.
-// Instead, they can be solved entirely using the public
-// parts of your $Promise library. Remember: the executor
-// function gives public access to the resolver / rejector.
+// NOTA ESPECIAL: La mejores soluciones para este capítulo NO LLAMAN
+// `_internalResolve` `_internalReject` directamente. En cambio, pueden
+// resolverse enteramente usando las partes públicas de tu libreria $Promise.
+// Recuerda: la función executor da acceso público al resolver / rejector.
 /*========================================================*/
 
 /* global $Promise customMatchers */
@@ -37,62 +36,65 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 250;
 
 function noop () {}
 
-// `$Promise.resolve` is not exactly the same thing as a resolver, at least
-// not in Pledge (depends on your promise library's implementation.)
+// `$Promise.resolve` no es exactamente la misma cosa como un resolver,
+// al menos no en Pledge (depende de tu implementación de la libreria
+// de promises).
 
-describe('The static method `$Promise.resolve`', function(){
+describe('El método estático `$Promise.resolve`', function(){
 
-  xit('is a function, and not one we have already written', function(){
+  xit('es una función, y no una que ya hemos escrito', function(){
     expect( typeof $Promise.resolve ).toBe( 'function' );
     var promise = new $Promise(noop);
     expect( $Promise.resolve ).not.toBe( promise._internalResolve );
   });
 
-  xit('takes a <plain value A> and returns a <promise for A>', function(){
+  xit('toma un <valor plano A> y devuelve una <promesa para A>', function(){
     [42, 'hi', {}, undefined, /cool/, false].forEach(value => {
       var promise = $Promise.resolve(value);
       expect( promise instanceof $Promise ).toBe( true );
-      // Do not set state & value manually; call a resolver.
+      // No setea el estado y valor manualmente; llama un resolver.
       expect( promise._state ).toBe( 'fulfilled' );
       expect( promise._value ).toBe( value );
     });
   });
 
-  // This would be more complex with "thenables," but we are ignoring those.
+  // Esto sería mas complejo con "then"s, pero vamos a ignorar eso.
 
-  xit('takes a <promise for A> and returns the same <promise for A>', function(){
+  xit('toma una <promesa para A> y devuelve la misma <promesa para A>', function(){
     var firstPromise = new $Promise(noop);
     var secondPromise = $Promise.resolve(firstPromise);
     expect( secondPromise ).toBe( firstPromise );
   });
 
-  // As you can see, `$Promise.resolve` "normalizes" values which may or may
-  // not be promises. Values become promises, and promises are already
-  // promises. Not sure if something is a promise? Use `$Promise.resolve`.
+  // Como puedes ver, `$Promise.resolve` "normaliza" valores que puede
+  // o puede que no sean promesas. Los valores se convierten en promesas
+  // y las promesas se mantienen como promesas. ¿No estas seguro que algo
+  // es una promesa? Usa `$Promise.resolve`.
 
-  // This spec should already pass if the above works. Read through the
-  // assertions and try to understand what they demonstrate.
+  // Este spec debería ya funcionar si lo de arriba funciona.
+  // Lee a través de las assertions y tratá de entender que demuestran.
 
-  xit('demonstrates why "resolved" and "fulfilled" are not synonyms', function(){
+  xit('demuestra porque "resolved" y "fulfilled" no son sinónimos', function(){
     var rejectedPromise = new $Promise(function (resolve, reject) {
       reject();
     });
-    // And now for the reveal:
-    var result = $Promise.resolve(rejectedPromise); // RESOLVING...
-    expect( result._state ).toBe( 'rejected' ); // ...but REJECTED!
-    // We "resolved" but still ended up with a rejected promise. So "resolve"
-    // really means *attempt* fulfillment. That works with normal values, or
-    // promises which are already fulfilled. However, we cannot lie and claim
-    // that an already-rejected promise is now magically fulfilled, without
-    // having actually handled the rejection reason.
+    // Y ahora la revelación:
+    var result = $Promise.resolve(rejectedPromise); // RESOLVIENDO...
+    expect( result._state ).toBe( 'rejected' ); // ...pero RECHAZADA!
+    // Hemos "resuelto" pero igual terminado con una promesa rechazada.
+    // Asi que "resolve" realmente significa *intento* de completarla(fulfill).
+    // Eso funciona con valores normales, o promesas que ya estan completadas.
+    // Sin embargo, no podemos mentir y aclamar que una promesa ya rechazada
+    // es ahora mágicamente completada, sin haber manejado la razón de rechazo.
   });
 
 });
 
-// `Promise.all` is one of the most useful methods in any async toolkit. The
-// `then` method gave us serial chaining; `all` gives us parallel waiting.
+// `Promise.all` es uno de los métodos más útiles en cualquier async
+// toolkit. El método `then` nos dió encadenamiento serial; `all` nos
+// da espera paralela.
 
-describe('The static method `$Promise.all`', function(){
+describe('El método estático `$Promise.all`', function(){
 
   var SMALL_DELAY = 10;
   var MAX_DELAY = 100;
@@ -103,21 +105,22 @@ describe('The static method `$Promise.all`', function(){
     jasmine.addMatchers(customMatchers);
   });
 
-  xit('is a function', function(){
+  xit('es una función', function(){
     expect( typeof $Promise.all ).toBe( 'function' );
   });
 
-  // Real ES6 `Promise.all` accepts ANY iterable (https://mzl.la/1SopN1G), but
-  // that is beyond Pledge's scope. Our `.all` only needs to support arrays.
+  // El `Promise.all` de ES6 acepta cualquier
+  // [iterable](https://mzl.la/1SopN1G), pero esto va mas alla del
+  // scope de Pledge. Nuestro `.all` solo necesita soportar arreglos.
 
-  xit('takes a single array argument', function(){
-    // Passing an array into `$Promise.all` causes no errors.
+  xit('toma un solo argumento de un arreglo', function(){
+    // Pasando un arreglo dentro de `$Promise.all` causa ningún error.
     function callingAllWithArrays () {
       $Promise.all([]);
       $Promise.all(values);
     }
     expect( callingAllWithArrays ).not.toThrow();
-    // Passing a non-array into `$Promise.all` throws a `TypeError`.
+    // Pasar un no-arreglo a `$Promise.all` arroja un `TypeError`.
     const nonArrayValues = [42, 'hi', false, {}, undefined, /wow/];
     nonArrayValues.forEach(value => {
       function callingAllWithValue () { return $Promise.all(value); }
@@ -125,36 +128,35 @@ describe('The static method `$Promise.all`', function(){
     });
   });
 
-  // Doesn't seem so hard at first.
+  // No parece tán dificil al principio.
 
-  xit('converts an <array of values> into a <promise for an array of values>', function (done) {
+  xit('convierte un <arreglo de valores> a una <promesa para un arreglo de valores>', function (done) {
     var promise = $Promise.all(values);
     expect( promise instanceof $Promise ).toBe(true);
-    // The promise should fulfill with the values.
+    // La promesa debería completarse con los valores
     expect( promise ).toFulfillWith( values, done );
   });
 
-  // Uh oh, getting a bit trickier.
-
-  xit('converts an <array of promises> into a <promise for an array of values>', function (done) {
+  // Uh oh, se va volviendo un poco más difícil
+  xit('convierte un <arreglo de promesas> en una <promesa para un arreglo de valores>', function (done) {
     var promises = values.map(value => $Promise.resolve(value));
     var promise = $Promise.all(promises);
-    // The promise should fulfill with values (not promises for values).
+    // La promesa debería completarse con valores (no promesas por valores).
     expect( promise ).toFulfillWith( values, done );
   });
 
-  // No shortcuts; each individual element may be a value or a promise for a value.
+  // Sin atajos; cada elemento individual puede ser un valor o una promesa por un valor.
 
-  xit('converts an <array of values and promises> into a <promise for an array of values>', function (done) {
+  xit('convierte un <arreglo de valores y promesas> a una <promesa para un arreglo de valores>', function (done) {
     var valuesAndPromises = values.map(value => {
       return Math.random() < 0.5 ? value : $Promise.resolve(value);
     });
     var promise = $Promise.all(valuesAndPromises);
-    // promise should fulfill with values (not mix of promises and values).
+    // la promesa debería completarse con valores (no una mezcla de promesas y valores).
     expect( promise ).toFulfillWith( values, done );
   });
 
-  // Helper: gives a promise for a value, resolves after a set or random delay.
+  // Ayuda: da una promesa por un valor, resuelve luego de un set de random delays.
 
   function slowPromise (value, delay) {
     return new $Promise(function (resolve) {
@@ -165,78 +167,84 @@ describe('The static method `$Promise.all`', function(){
     });
   }
 
-  // Oops! You weren't synchronously checking `._value`, were you? That won't
-  // work if a promise is still pending. Remember how to access a promise's
-  // eventual value? You might have to alter or augment your approach here.
+  // Oops! No estabas chequeando sincrónicamente `._value`, no? Eso no
+  // va a funcionar si una promesa sigue pendiente. ¿Recuerdas cómo
+  //acceder al eventual valor de la promesa? Vas a necesitar alterar
+  // o aumentar tu enfoque aquí.
 
-  xit('converts an <array of async promises> into a <promise for an array of values>', function (done) {
+  xit('convierte un <arreglo de promesas async> en una <promesa para un arreglo de valores>', function (done) {
     var promises = values.map((value, i) => {
       return slowPromise(value, SMALL_DELAY * (i + 1));
     });
     var promise = $Promise.all(promises);
-    // promise should fulfill with values... once those values actually exist.
+    // la promesa debería completarse con valores…
+    // …una vez que esos valores existen
     expect( promise ).toFulfillWith( values, done );
   });
 
-  // Don't simply push values in the order they finish. Somehow you have to
-  // keep track of which values go where in the final array.
+  // No pushees valores simplemente en orden que van terminando.
+  // De alguna manera tenés que mantener rastro de que valores
+  // van donde en el arreglo final
 
-  xit('converts an <array of async promises> (fulfilling in random order) into a <promise for an array of values> (ordered by index in the original array)', function (done) {
-    var promises = values.map(slowPromise); // random delays
+  xit('convierte un <arreglo de promesas async> (completandose en orden random) en una <promesa para un arreglo de valores> (ordenadas por el index del arreglo original)', function (done) {
+    var promises = values.map(slowPromise); // delays random
     var promise = $Promise.all(promises);
-    // promise should fulfill with values, and in the right order too!
+    // la promesa debería completarse con valores, y en el
+    // orden correcto también!
     expect( promise ).toFulfillWith( values, done );
   });
 
-  // So close now! What happens if one of the promises fails?
+  // Tan cerca ahora! ¿Qué pasa si una de las promesas falla?
 
-  xit('rejects with <reason E> when one of the input promises rejects with <reason E>', function (done) {
-    // promise that rejects after a random delay
+  xit('rechaza con <razon E> cuando uno de las promesas ingresadas rechaza con <razon E>', function (done) {
+    // la promesa que rechaza luego de un random delay
     var promiseThatRejects = new $Promise(noop);
     var doomsday = Math.random * MAX_DELAY;
     setTimeout(() => promiseThatRejects._internalReject('any Black Mirror episode'), doomsday);
-    // a bunch of promises which fulfill in random order
+    // un par de promesas que se van a completar en orden random
     var promises = values.map(slowPromise);
-    // slip our doomed promise in there somewhere
+    // mandamos nuestra promesa condenada en algún lugar
     var randomIndex = Math.floor(Math.random() * promises.length);
     promises.splice(randomIndex, 0, promiseThatRejects);
-    // wait for everything with $Promise.all
+    // espera por todo con $Promise.all
     var promise = $Promise.all(promises);
-    // promise should be rejected.
+    // la promesa debería ser rechazada
     expect( promise ).toRejectWith( 'any Black Mirror episode', done );
   });
 
   // This probably already passes, but let's be sure. We're strict that way.
 
-  xit('is not affected by additional rejections', function (done) {
-    // promises that reject after a random delay
+  xit('no es afectado por rechazos adicionales', function (done) {
+    // las promesas que rechaza luego de un random delay
     var doomed = new $Promise(noop);
     var reallyDoomed = new $Promise(noop);
     var doomsday = Math.random * MAX_DELAY;
     var postApocalypse = doomsday + SMALL_DELAY;
     setTimeout(() => doomed._internalReject('I am the first rejection'), doomsday);
     setTimeout(() => reallyDoomed._internalReject('I am too late, ignore me'), postApocalypse);
-    // a bunch of promises which fulfill in random order
+    // un par de promesas que se completan en orden random
     var promises = values.map(slowPromise);
-    // slip our doomed promises in there somewhere
+    // mandamos nuestras promesas condenadas en algún lugar
     var randomIndex1 = Math.floor(Math.random() * promises.length);
     var randomIndex2 = Math.floor(Math.random() * promises.length);
     promises.splice(randomIndex1, 0, doomed);
     promises.splice(randomIndex2, 0, reallyDoomed);
-    // wait for everything with $Promise.all
+    // espera por todo con $Promise.all
     var promise = $Promise.all(promises);
-    // promise should be rejected with first rejection reason.
+    // la promesa debería ser rechazada con la primera razón.
     expect( promise ).toRejectWith( 'I am the first rejection', done );
   });
 
-  // Whew! As we can see, `Promise.all` actually does quite a bit for us.
-  // Basically, we can give `.all` an array containing any mix of values and
-  // randomly-timed promises. In return, `.all` gives us a promise for all the
-  // eventual values, maintaining the original order of the array even if
-  // the promises fulfill out of order. And if any input promise fails, the
-  // output promise fails immediately with the same rejection reason.
+  // Vamos! Como podemos ver, `Promise.all` hace bastante por nosotros.
+  // Basicamente, podemos dar `.all` un arreglo conteniendo cualquier
+  // mezcla de valores y promesas con tiempos aleatorios. En retorno,
+  // `.all` nos da una promesa para todos los valores eventuales,
+  // manteniendo el orden original del arreglo incluso si la promesa se
+  // completa en cualquier orden. Y si cualquiera de las promesas ingresadas
+  // falla, la promesa que retorna falla inmediatamente con la misma razón
+  // de rechazo.
 });
 
 });
 
-// Don't forget to `git commit`!
+// No te olvides de `git commit`!
