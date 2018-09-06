@@ -103,7 +103,7 @@ describe('por una dada promiseA (pA)', function(){
 
     // Esto es para valores normales (sincrónico / non-promise) retornados
 
-    xit("si el success handler de pA retorna un valor `x`m pB es completado con `x`", function (done) {
+    xit("si el success handler de pA retorna un valor `x`, pB es completado con `x`", function (done) {
       var promiseB = promiseA.then( thisReturnsHi );
       promiseA._internalResolve();
       expect( promiseB ).toFulfillWith( 'hi', done );
