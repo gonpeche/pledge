@@ -44,11 +44,8 @@ $Promise.prototype.then = function(successCb, errorCb) {
 }
 
 $Promise.prototype._callHandler = function (successCb, errorCb) {
-
-
     if (this._state !== 'pending') {
         while (this._handlerGroups.length) {
-   
             if (this._handlerGroups[0].successCb !== 'undefined') {
                 this._handlerGroups[0].successCb(this._value);
                 this._handlerGroups.shift()
