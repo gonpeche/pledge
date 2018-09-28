@@ -6,11 +6,10 @@ Promises Workshop: construye la libreria de ES6 promises, pledge.js
 var $Promise = function (fn) {
     if (typeof fn !== 'function') throw TypeError ('/executor.+function/i')
     this._state = 'pending';
+    this._handlerGroups = [];
 
     this.executor = fn;
-
     this.executor(this._internalResolve.bind(this), this._internalReject.bind(this))
-
 }
 
 $Promise.prototype._internalResolve = function(someData) {
@@ -26,6 +25,21 @@ $Promise.prototype._internalReject = function (value) {
         this._value = value;
     }
 };
+
+
+$Promise.prototype.then = function(successCb, errorCb) {
+
+    if (typeof sucessCb !== 'function' && typeof errorCb !== 'function') {
+        this._handlerGroups.push({
+      
+        })
+    }
+    this._handlerGroups.push({
+        successCb: successCb,
+        errorCb: errorCb
+    })
+
+}
 
 
 
