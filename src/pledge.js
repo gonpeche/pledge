@@ -12,12 +12,15 @@ var $Promise = function (fn) {
     this.executor(this._internalResolve.bind(this), this._internalReject.bind(this))
 }
 
+$Promise.prototype._callHandler = function () {}
+
 $Promise.prototype._internalResolve = function(someData) {
     if (this._state === 'pending') {
         this._state = 'fulfilled';
         this._value = someData;
     }
 };
+
 
 $Promise.prototype._internalReject = function (value) {
     if (this._state === 'pending') {
