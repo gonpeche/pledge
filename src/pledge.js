@@ -7,7 +7,6 @@ var $Promise = function (fn) {
     if (typeof fn !== 'function') throw TypeError ('/executor.+function/i')
     this._state = 'pending';
     this._handlerGroups = [];
-
     this.executor = fn;
     this.executor(this._internalResolve.bind(this), this._internalReject.bind(this))
 }
@@ -19,6 +18,7 @@ $Promise.prototype._internalResolve = function(someData) {
         this._state = 'fulfilled';
         this._value = someData;
     }
+    this._callHandler()
 };
 
 
@@ -27,21 +27,32 @@ $Promise.prototype._internalReject = function (value) {
         this._state = 'rejected';
         this._value = value;
     }
+    this._callHandler()
 };
 
 
 $Promise.prototype.then = function(successCb, errorCb) {
-
-    if (typeof sucessCb !== 'function' && typeof errorCb !== 'function') {
-        this._handlerGroups.push({
-      
-        })
+    if (typeof successCb !== 'function' && typeof errorCb !== 'function') {
+        this._handlerGroups.push(false)
     }
     this._handlerGroups.push({
         successCb: successCb,
         errorCb: errorCb
     })
+    this._callHandler()
+}
 
+$Promise.prototype._callHandler = function (successCb, errorCb) {
+    if (this._state !== 'pending') {
+        for (var i = 0; i < this._handlerGroups.length; i++) {
+            if (this._handlerGroups[i].successCb !== 'undefined') {
+                this._handlerGroups[i].successCb(this._value);
+                this._handlerGroups.shift()
+            } else {
+            this._handlerGroups[i].errorCb();
+            }
+        }
+    }
 }
 
 
