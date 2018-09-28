@@ -12,7 +12,6 @@ var $Promise = function (fn) {
     this.executor(this._internalResolve.bind(this), this._internalReject.bind(this))
 }
 
-$Promise.prototype._callHandler = function () {}
 
 $Promise.prototype._internalResolve = function(someData) {
     if (this._state === 'pending') {
@@ -43,17 +42,22 @@ $Promise.prototype.then = function(successCb, errorCb) {
     this._callHandler()
 }
 
-$Promise.prototype._callHandler = function (successCb, errorCb) {
+
+$Promise.prototype._callHandler = function() {
     if (this._state !== 'pending') {
-        while (this._handlerGroups.length) {
-            if (this._handlerGroups[0].successCb !== 'undefined') {
-                this._handlerGroups[0].successCb(this._value);
-                this._handlerGroups.shift()
-            } else {
-                this._handlerGroups[0].errorCb();
-            }
+      while (this._handlerGroups.length) {
+        if (this._handlerGroups[0].successCb && this._state === 'fulfilled') {
+          this._handlerGroups[0].successCb(this._value);
+        } else if (this._handlerGroups[0].errorCb && this._state === 'rejected') {
+          this._handlerGroups[0].errorCb(this._value);
         }
+        this._handlerGroups.shift();
+      }
     }
+};
+
+$Promise.prototype.catch = function (fn) {
+    this.then(null, fn)
 }
 
 /*-------------------------------------------------------
