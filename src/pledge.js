@@ -3,6 +3,7 @@
 Promises Workshop: construye la libreria de ES6 promises, pledge.js
 ----------------------------------------------------------------*/
 // TU CÓDIGO AQUÍ:
+
 var $Promise = function (fn) {
     if (typeof fn !== 'function') throw TypeError ('/executor.+function/i')
     this._state = 'pending';
@@ -43,19 +44,20 @@ $Promise.prototype.then = function(successCb, errorCb) {
 }
 
 $Promise.prototype._callHandler = function (successCb, errorCb) {
+
+
     if (this._state !== 'pending') {
-        for (var i = 0; i < this._handlerGroups.length; i++) {
-            if (this._handlerGroups[i].successCb !== 'undefined') {
-                this._handlerGroups[i].successCb(this._value);
+        while (this._handlerGroups.length) {
+   
+            if (this._handlerGroups[0].successCb !== 'undefined') {
+                this._handlerGroups[0].successCb(this._value);
                 this._handlerGroups.shift()
             } else {
-            this._handlerGroups[i].errorCb();
+                this._handlerGroups[0].errorCb();
             }
         }
     }
 }
-
-
 
 /*-------------------------------------------------------
 El spec fue diseñado para funcionar con Test'Em, por lo tanto no necesitamos
